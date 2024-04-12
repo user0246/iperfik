@@ -1,4 +1,7 @@
 import iperf3
+import csv
+
+FILENAME = "datas.csv"
 
 #Enter part
 ipadd = input("Enter Server IP: ")
@@ -24,3 +27,14 @@ else:
 	print(f"Received bytes: {result.received_bytes}")
 	print(f"Sent bps: {result.sent_bps}")
 	#print(result.json)	JSON OUTPUT
+
+data = [result.time, result.sent_bytes, result.received_bytes, result.sent_bps]
+
+with open(FILENAME, "a", newline="") as file:
+	head = ["TIME", "SENT BYTES", "RECEIVED BYTES", "SENT BPS"]
+	writer = csv.writer(file)
+	writer.writerow(head)
+
+with open(FILENAME, "a", newline="") as file:
+	writer = csv.writer(file)
+	writer.writerow(data)
