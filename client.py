@@ -3,12 +3,13 @@ import csv
 
 FILENAME = "datas.csv"
 
-#Enter part
+#Input part
 ipadd = input("Enter Server IP: ")
 port = int(input("Enter port: "))
 streams = int(input("Enter number of streams: "))
 duration = int(input("Enter test duration in seconds: "))
 jitter = int(input("Enter interval in seconds: "))
+
 
 client = iperf3.Client()
 client.server_hostname = ipadd
@@ -18,6 +19,7 @@ client.jitter_ms = jitter
 client.port = port
 result = client.run()
 
+#Output part
 if result.error:
 	print(result.error)
 else:
@@ -28,6 +30,7 @@ else:
 	print(f"Sent bps: {result.sent_bps}")
 	#print(result.json)	JSON OUTPUT
 
+#File creation
 data = [result.time, result.sent_bytes, result.received_bytes, result.sent_bps]
 
 with open(FILENAME, "a", newline="") as file:
