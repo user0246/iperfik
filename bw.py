@@ -1,9 +1,10 @@
 import iperf3
 import click
 import csv
+from datetime import datetime
 
 
-FILENAME = "datas.csv"
+FILENAME = "data.csv"
 
 @click.group()
 def grp():
@@ -26,25 +27,28 @@ def server(port):
 @click.option('--time', '-t', default=10, help="TIME DURATION")
 @click.option('--interval', '-i', default=2, help="INTERVAL")
 @click.option('--port', '-p', default=5201, help="PORT")
+@click.option('--reverse', '-R', default=False, help="REVERSE, BIDIRECTIONAL TESTING")
 @click.argument('ipadd')
-def client(streams, time, interval, port, ipadd):
+def client(streams, time, interval, port, reverse, ipadd):
+	nowtime = datetime.now()
 	client = iperf3.Client()
 	client.server_hostname = ipadd
 	client.num_streams = streams
 	client.duration = time
 	client.jitter_ms = interval
 	client.port = port
+	if reverse == True:
+		client.reverse == True
 	result = client.run()
 	
 
-	data = [result.time, result.sent_bytes, result.received_bytes, result.sent_bps]
-
+	header = ["TIMESTAMP", "THROUGHPUT_UPLINK(AVG)", "THROUGHPUT_DOWNLINK(AVG)"]
+	data = [nowtime, result.sent_Mbps//streams, result.received_Mbps//streams]
 	with open(FILENAME, "a", newline="") as file:
-		head = ["TIME", " SENT BYTES", " RECEIVED BYTES", " SENT BPS"]
 		writer = csv.writer(file)
-		writer.writerow(head)
-		writer.writerow(data)	
-
+		if file.tell() == 0:
+			writer.writerow(header)
+		writer.writerow(data)
 
 grp.add_command(server)
 grp.add_command(client)
